@@ -1,0 +1,447 @@
+openapi: 3.0.0
+info:
+  title: Video share API
+  version: 1.0.0
+  description: Applicaion for sharing videos
+license:
+  name: MIT
+  url: 'https://choosealicense.com/licenses/mit/'
+contact:
+  name: kikoano
+  url: 'https://github.com/kikoano'
+  email: kikoano111@gmail.com
+servers:
+  - url: 'http://localhost:8080/api/v1'
+  - url: 'http://192.168.0.26:8080/api/v1'
+components:
+  securitySchemes:
+    token:
+      type: apiKey
+      in: cookie
+      name: token 
+    refreshToken:
+      type: apiKey
+      in: cookie
+      name: refreshToken  
+  schemas:
+    Follow:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        follow_user_id:
+          type: string
+    Playlist:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        playlist_name:
+          type: string
+    Auth:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+          format: password
+        email:
+          type: string
+          format: email
+          description: 'Email for the user, needs to be unique.'
+        refreshToken:
+          type: string
+    UserData:
+      type: object
+      properties:
+        id:
+          type: string
+        user_id:
+          type: string
+        username:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        avatar_imgurl:
+          type: string
+    Video:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        category_id:
+          type: string
+        user_id:
+          type: string
+        upload_date:
+          type: string
+  requestBodies:
+    PlaylistBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              playlist_name:
+                type: string
+    AuthRegisterBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+                format: password
+              email:
+                type: string
+                format: email
+    UserDataCreateBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              first_name:
+                type: string
+              last_name:
+                type: string
+              avatar_imgurl:
+                type: string
+    AuthLoginBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+                format: password
+    VideoBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              url:
+                type: string
+              title:
+                type: string
+              description:
+                type: string
+              category_id:
+                type: string
+security:
+  - token: []
+  - refreshToken: []
+paths:
+  /playlist:
+    post:
+      summary: Create playlist
+      tags:
+        - Playlist
+      requestBody:
+        $ref: '#/components/requestBodies/PlaylistBody'
+      responses:
+        '200':
+          description: Successful operation
+    delete:
+      summary: Delete playlist
+      tags:
+        - Playlist
+      responses:
+        '200':
+          description: Successful operation
+    get:
+      summary: Get user playlist
+      tags:
+        - Playlist
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                items:
+                  $ref: '#/components/schemas/Playlist'
+  /users:
+    get:
+      summary: Get all users
+      tags:
+        - UserData
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserData'
+    post:
+      summary: Create UserData
+      tags:
+        - UserData
+      requestBody:
+        $ref: '#/components/requestBodies/UserDataCreateBody'
+      responses:
+        '200':
+          description: Successful operation
+        '500':
+          description: Internal server error
+  '/users/{id}/':
+    get:
+      summary: Get user
+      tags:
+        - UserData
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: User id
+      responses:
+        '200':
+          description: Successful operation
+  /register:
+    post:
+      summary: Register a new user
+      tags:
+        - Auth
+      security: []
+      requestBody:
+        $ref: '#/components/requestBodies/AuthRegisterBody'
+      responses:
+        '200':
+          description: Successful operation
+        '500':
+          description: Internal server error
+  /login:
+    post:
+      summary: Login user
+      tags:
+        - Auth
+      security: []
+      requestBody:
+        $ref: '#/components/requestBodies/AuthLoginBody'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Wrong password
+        '404':
+          description: User not found
+  /logout:
+    patch:
+      summary: Logout user
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: Successful operation
+        '404':
+          description: User not found
+  /followers:
+    get:
+      summary: Get user followers
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Follow'
+  /videos:
+    get:
+      summary: Get all videos
+      tags:
+        - Videos
+      parameters:
+        - in: query
+          name: sort
+          schema:
+            type: string
+          description: Sort videos
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                items:
+                  $ref: '#/components/schemas/Video'
+    post:
+      summary: Upload video
+      tags:
+        - Videos
+      requestBody:
+        $ref: '#/components/requestBodies/VideoBody'
+      responses:
+        '200':
+          description: Successful operation
+  
+  /videos/history:
+    get:
+      summary: Get history watched videos
+      tags:
+        - Videos
+      parameters:
+        - in: query
+          name: sort
+          schema:
+            type: string
+          description: Sort videos
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                items:
+                  $ref: '#/components/schemas/Video'
+  '/videos/{id}/like':
+    post:
+      summary: Like/Dislike video
+      tags:
+        - Videos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Video id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                like:
+                  type: boolean
+      responses:
+        '200':
+          description: Successful operation
+  '/videos/{id}/':
+    get:
+      summary: Watch video
+      tags:
+        - Videos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Video id
+      responses:
+        '200':
+          description: Successful operation
+  '/videos/{id}/favorite':
+    post:
+      summary: Favorite video
+      tags:
+        - Videos
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: Video id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                favorite:
+                  type: boolean
+      responses:
+        '200':
+          description: Successful operation
+  /videos/favorite:
+    get:
+      summary: Get user favorite videos
+      tags:
+        - Videos
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                items:
+                  $ref: '#/components/schemas/Video'
+  /videos/like:
+    get:
+      summary: Get user like videos
+      tags:
+        - Videos
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+                items:
+                  $ref: '#/components/schemas/Video'
+  /test:
+    get:
+      summary: Test auth
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: string
+tags:
+  - name: Auth
+    description: Auth management
+  - name: UserData
+    description: UserData management
+  - name: Playlist
+    description: Playlist management
+  - name: Videos
+    description: Video management
