@@ -59,7 +59,9 @@ const payloadHook = {
 
 gateway({
   middlewares: [
-    require("cors")(),
+    require("cors")({
+      origin: "http://localhost:8080"
+    }),
     require("helmet")(),
     cookieParser()
   ],

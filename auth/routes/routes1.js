@@ -61,13 +61,6 @@ router.post("/login", async (req, res) => {
         secure: false, // set to true if your using https
         httpOnly: true,
     });
-    //ONLY FOR DEV saving username in cookie instead of passing it in header because middlewhare cannot pass data to next() bug
-    /*res.cookie('username', username, {
-        expires: new Date(Date.now() + 5184000000),
-        secure: false, // set to true if your using https
-        httpOnly: true,
-    });*/
-
     res.status(200).json("Successful login");
 });
 router.get("/test", async (req, res) => {
@@ -123,14 +116,12 @@ router.get("/auth", (req, res) => {
 });
 
 router.patch("/logout", async (req, res) => {
-    //const username = req.cookies.username;
     await User.findByIdAndUpdate(req.headers.id, { refreshToken: null }, (err) => {
         if (err)
             return res.status(200).send("User not logged in!");
     });
     res.clearCookie("token");
     res.clearCookie("refreshToken");
-    //res.clearCookie("username");
     res.status(200).send("User logout!");
 });
 export default router;
