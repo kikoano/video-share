@@ -10,7 +10,7 @@
     "express-rate-limit": "^5.0.0",
     "fast-gateway": "^2.0.2",
     "helmet": "^3.21.2",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^3.1.1",
     "nodemon": "^2.0.2",
     "request": "^2.88.0",
     "request-ip": "^2.1.3"
